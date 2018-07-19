@@ -17,7 +17,7 @@ const cheerio = require('cheerio'); // Cheerio takes raw HTML, parses it, and re
 const today = moment().local().format("YYYY-MM-DD");  // get today's date in the local time zone
 const baseURL = "http://shirts4mike.com/"; // base URL which is common to all pages we want to scrape
 
-// check if the sub-directory 'data' exists; if not create it
+// check if the sub-directory 'data' exists; if not, create it
 fs.access('./data', fs.constants.F_OK, function (err) {
   if (err) {
     fs.mkdirSync('data');
@@ -32,7 +32,14 @@ const request = req(`${baseURL}shirts.php`, function (error, response, body) {
   } else if (response.statusCode == 200) {
     console.log(`Good news! Connected to ${baseURL}shirts.php, the resulting csv file is in the "data" sub-directory.`);
 
-    // create a new .csv file with today's date as the file name, and Headers for the data columns
+    // if a csv exists in the "data" directory, remove it
+    const existingFile = fs.readdirSync('./data/');
+    if (existingFile[0]) {
+      console.log(existingFile[0]);
+      fs.unlinkSync(`./data/${existingFile[0]}`);
+    }
+
+    // create a new.csv file with today's date as the file name, and Headers for the data columns
     fs.writeFileSync(`./data/${today}.csv`, `Title, Price, ImageURL, URL, Time \n`);
 
     // use Cheerio to get the html from the body of the Single Entry Point webpage
