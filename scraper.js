@@ -1,3 +1,12 @@
+/*
+		Treehouse techdegree project 6
+    
+    BUILD A WEBSITE CONTENT SCRAPER WITH NODE.JS
+    
+		All code contained in this JS file is the work of me, Jeremy Bowden
+		email: jeremy@jeremybowden.net
+*/
+
 // import required npm modules
 const moment = require('moment'); // For date and time
 const fs = require('fs'); // File system
@@ -6,7 +15,6 @@ const cheerio = require('cheerio'); // Cheerio takes raw HTML, parses it, and re
 
 // global variables
 const today = moment().local().format("YYYY-MM-DD");  // get today's date in the local time zone
-const singleEntryPoint = "http://shirts4mike.com/shirts.php"; // the URL that the scraper starts on
 const baseURL = "http://shirts4mike.com/"; // base URL which is common to all pages we want to scrape
 
 // check if the sub-directory 'data' exists; if not create it
@@ -16,22 +24,27 @@ fs.access('./data', fs.constants.F_OK, function (err) {
   }
 });
 
-// go into the Single Entry Point webpage; loop over each shirt page to populate the .csv file
-const request = req(singleEntryPoint, function (error, response, body) {
-  if (!error && response.statusCode == 200) {
-    // check if a .csv file with today's date already exists in the sub-directory 'data'; if yes then delete it
-    // because we will create a new one
+// http request to the Single Entry Point webpage
+// then loop over each shirt page to populate the .csv file
+const request = req(`${baseURL}shirts.php`, function (error, response, body) {
+  if (error !== null) {
+    console.log(`There's been an error; cannot connect to ${error.host}`);
+  } else if (response.statusCode == 200) {
+    console.log(`Good news! Connected to ${baseURL}shirts.php, the resulting csv file is in the "data" sub-directory.`);
+
+    // check if a .csv file with today's date already exists in the sub-directory 'data',
+    // if yes then delete it because we will create a new one for each http request
     fs.access(`./data/${today}.csv`, fs.constants.F_OK, function (err) {
-      err ? console.log("CSV file will be created") : fs.unlinkSync(`./data/${today}.csv`);
+      err ? console.log("CSV file creation") : fs.unlinkSync(`./data/${today}.csv`);
     });
 
     // use Cheerio to get the html from the body of the Single Entry Point webpage
     // $ convention per jQuery
     const $ = cheerio.load(body);
-    // select all <a> elements whose href attribute starts with 'shirt.php?id=10'.
-    // Each one is a link to a 'shirt page' that needs scraping
+    // select all <a> elements whose href attribute starts with 'shirt.php?id=10'
+    // each one is a link to a 'shirt page' that needs scraping
     const shirtPageLinks = $("a[href^='shirt.php?id=10']");
-    // for each page, use Cheerio again to access the html of the page, and scrape the data we need from the html
+    // for each page, use Cheerio again to access the html of the page, and scrape the data we need from it
     shirtPageLinks.each(function () {
       const shirtURL = baseURL + $(this).attr('href');
       const shirtPage = req(shirtURL, function (error, response, body) {
@@ -46,9 +59,7 @@ const request = req(singleEntryPoint, function (error, response, body) {
         fs.appendFileSync(`./data/${today}.csv`, title + ',' + price + ',' + imgURL + ',' + url + ',' + time + '\n');
       });
     });
-  } else if (response.statusCode !== 200) {
-    console.error(`Whoops! We have a ${response.statusCode} error, which means ${response.statusMessage}.\n`);
   } else {
-    console.error(`Whoops! We have an error. Looks like: ${error.statusMessage}.`);
+    console.log(`There's been a ${response.statusCode} error when trying to connect to ${baseURL}`);
   }
 });
