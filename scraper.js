@@ -32,11 +32,8 @@ const request = req(`${baseURL}shirts.php`, function (error, response, body) {
   } else if (response.statusCode == 200) {
     console.log(`Good news! Connected to ${baseURL}shirts.php, the resulting csv file is in the "data" sub-directory.`);
 
-    // check if a .csv file with today's date already exists in the sub-directory 'data',
-    // if yes then delete it because we will create a new one for each http request
-    fs.access(`./data/${today}.csv`, fs.constants.F_OK, function (err) {
-      err ? console.log("CSV file creation") : fs.unlinkSync(`./data/${today}.csv`);
-    });
+    // create a new .csv file with today's date as the file name, and Headers for the data columns
+    fs.writeFileSync(`./data/${today}.csv`, `Title, Price, ImageURL, URL, Time \n`);
 
     // use Cheerio to get the html from the body of the Single Entry Point webpage
     // $ convention per jQuery
@@ -56,7 +53,7 @@ const request = req(`${baseURL}shirts.php`, function (error, response, body) {
         const imgURL = baseURL + imageElement.attr('src');
         const time = moment().local().format("HH:mm");
         // add the data to the .csv file
-        fs.appendFileSync(`./data/${today}.csv`, title + ',' + price + ',' + imgURL + ',' + url + ',' + time + '\n');
+        fs.appendFileSync(`./data/${today}.csv`, title + ', ' + price + ', ' + imgURL + ', ' + url + ', ' + time + '\n');
       });
     });
   } else {
