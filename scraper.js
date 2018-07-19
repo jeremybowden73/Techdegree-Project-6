@@ -37,7 +37,7 @@ const request = req(singleEntryPoint, function (error, response, body) {
       const shirtPage = req(shirtURL, function (error, response, body) {
         const $ = cheerio.load(body);
         const price = $('span.price').text().trim();
-        const title = $('title').text().replace(',', '-'); // replace , with - to avoid screwing-up the csv file!
+        const title = $('title').text().replace(',', ' -'); // replace , with - to avoid screwing-up the csv file
         const url = shirtURL;
         const imageElement = $("img[src^='img/shirts/shirt']");
         const imgURL = baseURL + imageElement.attr('src');
@@ -46,5 +46,9 @@ const request = req(singleEntryPoint, function (error, response, body) {
         fs.appendFileSync(`./data/${today}.csv`, title + ',' + price + ',' + imgURL + ',' + url + ',' + time + '\n');
       });
     });
+  } else if (response.statusCode !== 200) {
+    console.error(`Whoops! We have a ${response.statusCode} error, which means ${response.statusMessage}.\n`);
+  } else {
+    console.error(`Whoops! We have an error. Looks like: ${error.statusMessage}.`);
   }
 });
