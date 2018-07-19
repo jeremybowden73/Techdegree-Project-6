@@ -1,0 +1,20 @@
+{
+  "name": "techdegree-project-6",
+  "version": "1.0.0",
+  "description": "Static website content scraper",
+  "main": "scraper.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "scraper",
+    "treehouse"
+  ],
+  "author": "Jeremy Bowden",
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "fs": "0.0.1-security",
+    "request": "^2.87.0"
+  }
+}
