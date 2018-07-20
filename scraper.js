@@ -7,16 +7,22 @@
 		email: jeremy@jeremybowden.net
 */
 
+
 // import required npm modules
 const colors = require('colors'); // For colorising text logged to the console
 const moment = require('moment'); // For date and time
-const fs = require('fs'); // File system
+const fs = require('fs'); // For accessing the file system
 const req = require('request'); // For making http requests
 const cheerio = require('cheerio'); // Cheerio takes raw HTML, parses it, and returns a jQuery object so you may traverse the DOM
 
+
 // global variables
 const today = moment().local().format("YYYY-MM-DD");  // get today's date in the local time zone
+const timeNow = moment().local().format("h:mm:ssa");  // get the current time in the local time zone
 const baseURL = "http://shirts4mike.com/"; // base URL which is common to all pages we want to scrape
+const errorFile = "scraper-error.log"; // name of file where errors will be logged
+let errorMessage; // variable for storing an error message
+
 
 // check if the sub-directory 'data' exists; if not, create it
 fs.access('./data', fs.constants.F_OK, function (err) {
@@ -25,13 +31,14 @@ fs.access('./data', fs.constants.F_OK, function (err) {
   }
 });
 
-// http request to the Single Entry Point webpage
-// then loop over each shirt page to populate the .csv file
+
+// http request to the Single Entry Point webpage then loop over each shirt page to populate a csv file
 const request = req(`${baseURL}shirts.php`, function (error, response, body) {
   if (error !== null) {
-    console.log(`There's been an error; cannot connect to ${error.host}`.red);
+    errorMessage = `There's been an error; cannot connect to ${error.host}`;
+    console.log(errorMessage.red);
   } else if (response.statusCode == 200) {
-    console.log(`Good news! Connected to ${baseURL}shirts.php, the resulting csv file is in the "data" sub-directory.`.green);
+    console.log(`Good news! Connected to ${baseURL}shirts.php, the csv file is in the "data" sub-directory.`.green);
 
     // if any files exist in the "data" directory, remove them all
     const dataFiles = fs.readdirSync('./data/');
@@ -64,6 +71,12 @@ const request = req(`${baseURL}shirts.php`, function (error, response, body) {
       });
     });
   } else {
-    console.log(`There's been a ${response.statusCode} error when trying to connect to ${baseURL}`.red);
+    errorMessage = `There's been a ${response.statusCode} error when trying to connect to ${baseURL}`;
+    console.log(errorMessage.red);
+  }
+
+  // if there was an error, append the appropriate error message to the "errorFile"
+  if (error !== null || response.statusCode !== 200) {
+    fs.appendFileSync(`${errorFile}`, `${today} ${timeNow}: ${errorMessage}\n`);
   }
 });
