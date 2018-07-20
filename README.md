@@ -12,4 +12,5 @@ Usage:
 
 
 The resulting .csv file will be in the sib-directory "data".
+
 Error messages will be logged to the file "scraper-error.log".
