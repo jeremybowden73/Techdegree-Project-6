@@ -32,11 +32,10 @@ const request = req(`${baseURL}shirts.php`, function (error, response, body) {
   } else if (response.statusCode == 200) {
     console.log(`Good news! Connected to ${baseURL}shirts.php, the resulting csv file is in the "data" sub-directory.`);
 
-    // if a csv exists in the "data" directory, remove it
-    const existingFile = fs.readdirSync('./data/');
-    if (existingFile[0]) {
-      console.log(existingFile[0]);
-      fs.unlinkSync(`./data/${existingFile[0]}`);
+    // if any files exist in the "data" directory, remove them all
+    const dataFiles = fs.readdirSync('./data/');
+    if (dataFiles) {
+      dataFiles.forEach(item => fs.unlinkSync(`./data/${item}`));
     }
 
     // create a new.csv file with today's date as the file name, and Headers for the data columns
