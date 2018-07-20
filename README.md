@@ -8,7 +8,7 @@ Usage:
       (to install required modules)
 3. At the command line:
       npm start
-      (to start the scraper)
+      (to start the scraper. You can also use "node scraper.js")
 
 
 The resulting .csv file will be in the sib-directory "data".
