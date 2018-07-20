@@ -8,6 +8,7 @@
 */
 
 // import required npm modules
+const colors = require('colors'); // For colorising text logged to the console
 const moment = require('moment'); // For date and time
 const fs = require('fs'); // File system
 const req = require('request'); // For making http requests
@@ -28,9 +29,9 @@ fs.access('./data', fs.constants.F_OK, function (err) {
 // then loop over each shirt page to populate the .csv file
 const request = req(`${baseURL}shirts.php`, function (error, response, body) {
   if (error !== null) {
-    console.log(`There's been an error; cannot connect to ${error.host}`);
+    console.log(`There's been an error; cannot connect to ${error.host}`.red);
   } else if (response.statusCode == 200) {
-    console.log(`Good news! Connected to ${baseURL}shirts.php, the resulting csv file is in the "data" sub-directory.`);
+    console.log(`Good news! Connected to ${baseURL}shirts.php, the resulting csv file is in the "data" sub-directory.`.green);
 
     // if any files exist in the "data" directory, remove them all
     const dataFiles = fs.readdirSync('./data/');
@@ -63,6 +64,6 @@ const request = req(`${baseURL}shirts.php`, function (error, response, body) {
       });
     });
   } else {
-    console.log(`There's been a ${response.statusCode} error when trying to connect to ${baseURL}`);
+    console.log(`There's been a ${response.statusCode} error when trying to connect to ${baseURL}`.red);
   }
 });
