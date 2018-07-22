@@ -66,7 +66,7 @@ const request = req(`${baseURL}shirts.php`, function (error, response, body) {
         const imageElement = $("img[src^='img/shirts/shirt']");
         const imgURL = baseURL + imageElement.attr('src');
         const time = moment().local().format("HH:mm");
-        // add the data to the CSV array
+        // add the data to the CSV array and create a CSV file
         dataForCSV.push([[`${title}`], [`${price}`], [`${imgURL}`], [`${url}`], [`${time}`]]);
         csvFileCreator(csvFileName, dataForCSV);
       });
