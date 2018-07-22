@@ -9,6 +9,7 @@
 
 
 // import required npm modules
+const csvFileCreator = require('csv-file-creator');
 const colors = require('colors'); // For colorising text logged to the console
 const moment = require('moment'); // For date and time
 const fs = require('fs'); // For accessing the file system
@@ -22,7 +23,10 @@ const timeNow = moment().local().format("h:mm:ssa");  // get the current time in
 const baseURL = "http://shirts4mike.com/"; // base URL which is common to all pages we want to scrape
 const errorFile = "scraper-error.log"; // name of file where errors will be logged
 let errorMessage; // variable for storing an error message
-
+const csvFileName = `./data/${today}.csv`; // filename for the CSV file to be created
+const dataForCSV = []; // empty array for storing the data for creating the CSV file
+dataForCSV.push([['Title'], ['Price'], ['ImageURL'], ['URL'], ['Time']]); // add the headers
+dataForCSV.push([[2], [4], [6], [8], [10]]);
 
 // check if the sub-directory 'data' exists; if not, create it
 fs.access('./data', fs.constants.F_OK, function (err) {
@@ -46,9 +50,6 @@ const request = req(`${baseURL}shirts.php`, function (error, response, body) {
       dataFiles.forEach(item => fs.unlinkSync(`./data/${item}`));
     }
 
-    // create a new.csv file with today's date as the file name, and Headers for the data columns
-    fs.writeFileSync(`./data/${today}.csv`, `Title, Price, ImageURL, URL, Time \n`);
-
     // use Cheerio to get the html from the body of the Single Entry Point webpage
     // $ convention per jQuery
     const $ = cheerio.load(body);
@@ -66,10 +67,13 @@ const request = req(`${baseURL}shirts.php`, function (error, response, body) {
         const imageElement = $("img[src^='img/shirts/shirt']");
         const imgURL = baseURL + imageElement.attr('src');
         const time = moment().local().format("HH:mm");
-        // add the data to the .csv file
-        fs.appendFileSync(`./data/${today}.csv`, title + ', ' + price + ', ' + imgURL + ', ' + url + ', ' + time + '\n');
+        // add the data to the CSV array
+        dataForCSV.push([[`${title}`], [`${price}`], [`${imgURL}`], [`${url}`], [`${time}`]]);
+        // console.log(dataForCSV);
+        csvFileCreator(csvFileName, dataForCSV);
       });
     });
+    // console.log("FINAL: " + dataForCSV);
   } else {
     errorMessage = `There's been a ${response.statusCode} error when trying to connect to ${baseURL}`;
     console.log(errorMessage.red);
@@ -80,3 +84,7 @@ const request = req(`${baseURL}shirts.php`, function (error, response, body) {
     fs.appendFileSync(`${errorFile}`, `${today} ${timeNow}: ${errorMessage}\n`);
   }
 });
+
+function appendDataToCSV(data) {
+  csvFileCreator(csvFileName, dataForCSV);
+}
