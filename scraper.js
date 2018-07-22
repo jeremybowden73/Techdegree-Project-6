@@ -9,7 +9,7 @@
 
 
 // import required npm modules
-const csvFileCreator = require('csv-file-creator');
+const csvFileCreator = require('csv-file-creator'); // For creating a CSV file
 const colors = require('colors'); // For colorising text logged to the console
 const moment = require('moment'); // For date and time
 const fs = require('fs'); // For accessing the file system
@@ -26,7 +26,6 @@ let errorMessage; // variable for storing an error message
 const csvFileName = `./data/${today}.csv`; // filename for the CSV file to be created
 const dataForCSV = []; // empty array for storing the data for creating the CSV file
 dataForCSV.push([['Title'], ['Price'], ['ImageURL'], ['URL'], ['Time']]); // add the headers
-dataForCSV.push([[2], [4], [6], [8], [10]]);
 
 // check if the sub-directory 'data' exists; if not, create it
 fs.access('./data', fs.constants.F_OK, function (err) {
@@ -69,11 +68,9 @@ const request = req(`${baseURL}shirts.php`, function (error, response, body) {
         const time = moment().local().format("HH:mm");
         // add the data to the CSV array
         dataForCSV.push([[`${title}`], [`${price}`], [`${imgURL}`], [`${url}`], [`${time}`]]);
-        // console.log(dataForCSV);
         csvFileCreator(csvFileName, dataForCSV);
       });
     });
-    // console.log("FINAL: " + dataForCSV);
   } else {
     errorMessage = `There's been a ${response.statusCode} error when trying to connect to ${baseURL}`;
     console.log(errorMessage.red);
@@ -85,6 +82,3 @@ const request = req(`${baseURL}shirts.php`, function (error, response, body) {
   }
 });
 
-function appendDataToCSV(data) {
-  csvFileCreator(csvFileName, dataForCSV);
-}
