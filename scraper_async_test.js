@@ -44,17 +44,22 @@ function populateCSVDataArray() {
     const time = moment().local().format("HH:mm");
     // add the data to the CSV array and create a CSV file
     dataForCSV.push([[`${price}`], [`${time}`]]);
-    // console.log(dataForCSV);
-    csvFileCreator(csvFileName, dataForCSV);
+    console.log("This is in the req function");
+    // csvFileCreator(csvFileName, dataForCSV);
   });
 };
 
 populateCSVDataArray();
 
+
 async function populate() {
   await anotherOne();
   csvFileCreator(csvFileName, dataForCSV);
 }
+
+csvFileCreator(csvFileName, dataForCSV);
+console.log("This should be right at the end!");
+
 
 
 
