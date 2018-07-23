@@ -49,7 +49,7 @@ function populateCSVDataArray() {
   });
 };
 
-populateCSVDataArray();
+//populateCSVDataArray();
 
 
 async function populate() {
@@ -57,8 +57,49 @@ async function populate() {
   csvFileCreator(csvFileName, dataForCSV);
 }
 
-csvFileCreator(csvFileName, dataForCSV);
-console.log("This should be right at the end!");
+
+// ////////////////
+function resolveAfter2Seconds(x) {
+  return new Promise(resolve => {
+    req('http://shirts4mike.com/shirt.php?id=101', function (error, response, body) {
+      const $ = cheerio.load(body);
+      const price = $('span.price').text().trim();
+      const time = moment().local().format("HH:mm");
+      console.log(price);
+      // add the data to the CSV array and create a CSV file
+      dataForCSV.push([[`${price}`], [`${time}`]]);
+      resolve("This is in the 2SECONDS function");
+      //csvFileCreator(csvFileName, dataForCSV);
+    });
+
+
+  });
+}
+
+
+function resolveAfter3Seconds(x) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve("3 seconds up");
+    }, 2500);
+  });
+}
+
+
+async function f1() {
+  var x = await resolveAfter2Seconds(10);
+  console.log(x);
+  console.log("This should be right at the end!");
+  // create the csv file
+  csvFileCreator(csvFileName, dataForCSV);
+}
+
+f1();
+
+// //////////////////
+
+
+
 
 
 
