@@ -7,6 +7,7 @@
 		email: jeremy@jeremybowden.net
 */
 
+// ********************** THE ASYNC PROBLEM STUFF STARTS AT LINE  55 *******************************************************
 
 // import required npm modules
 const csvFileCreator = require('csv-file-creator'); // For creating a CSV file
@@ -26,6 +27,7 @@ let errorMessage; // variable for storing an error message
 const csvFileName = `./data/${today}.csv`; // filename for the CSV file to be created
 const dataForCSV = []; // empty array for storing the data for creating the CSV file
 dataForCSV.push([['Title'], ['Price'], ['ImageURL'], ['URL'], ['Time']]); // add the headers
+let shirtPageLinks;
 
 // check if the sub-directory 'data' exists; if not, create it
 fs.access('./data', fs.constants.F_OK, function (err) {
@@ -33,8 +35,6 @@ fs.access('./data', fs.constants.F_OK, function (err) {
     fs.mkdirSync('data');
   }
 });
-
-
 
 function populateCSVDataArray() {
   // for each page, use Cheerio again to access the html of the page, and scrape the data we need from it
@@ -49,56 +49,59 @@ function populateCSVDataArray() {
   });
 };
 
-//populateCSVDataArray();
 
 
-async function populate() {
-  await anotherOne();
-  csvFileCreator(csvFileName, dataForCSV);
+
+// 
+// async function, allowing the use of "await" which forces the program to wait for the Promise
+// to be returned from the function "resolveforXSeconds" before logging the next two lines fo code.
+// without the "await" the code would run asynchronously, so those two lines of code would be
+// executed BEFORE the function "resolveforXSeconds" returns its Promise
+async function f1() {
+  var x = await resolveAfter2Seconds(shirtPageLinks);
+  console.log(x);
+  console.log("This should be the last thing to log!");
+  // create the csv file
+  // csvFileCreator(csvFileName, dataForCSV);
 }
 
 
-// ////////////////
-function resolveAfter2Seconds(x) {
-  return new Promise(resolve => {
+// function to simulate an async method that takes 3 seconds to complete.
+// after it completes it returns 'resolve' i.e. "3 seconds up"
+function resolveAfter3Seconds(x) {
+  return new Promise(function (resolve, reject) {
+    setTimeout(() => {
+      resolve("3 seconds up");
+      reject("failed");
+    }, 3000);
+  });
+}
+
+// function to 
+function resolveAfter2Seconds(shirtPageLinks) {
+  return new Promise(function (resolve, reject) {
+
     req('http://shirts4mike.com/shirt.php?id=101', function (error, response, body) {
       const $ = cheerio.load(body);
       const price = $('span.price').text().trim();
       const time = moment().local().format("HH:mm");
-      console.log(price);
+      console.log(price); // This should be the first thing to log to the console
+
       // add the data to the CSV array and create a CSV file
-      dataForCSV.push([[`${price}`], [`${time}`]]);
+      // dataForCSV.push([[`${price}`], [`${time}`]]);
       resolve("This is in the 2SECONDS function");
-      //csvFileCreator(csvFileName, dataForCSV);
     });
 
 
+    // NOTE: you can't put the resolve here, after the asynchronous "req" function because it will return before the "req" function is done
+    // resolve("This is in the 2SECONDS function");
+
+
   });
-}
+};
 
-
-function resolveAfter3Seconds(x) {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve("3 seconds up");
-    }, 2500);
-  });
-}
-
-
-async function f1() {
-  var x = await resolveAfter2Seconds(10);
-  console.log(x);
-  console.log("This should be right at the end!");
-  // create the csv file
-  csvFileCreator(csvFileName, dataForCSV);
-}
 
 f1();
-
-// //////////////////
-
-
 
 
 
