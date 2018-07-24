@@ -9,9 +9,9 @@
 
 //
 // Issue with code is that a CSV file is generated with csvFileCreator 
-// on each iteratiom of the shirtPageLinks.each loop.
+// on each iteratiom of the shirtPageLinks.each loop (line 68).
 // It would be better if the CSV file was created only once, after the loop
-// has complated, but because the loop contains an asynchronous method (req)
+// has completed, but because the loop contains an asynchronous method (req)
 // moving the csvFileCreator to after the loop would result in it firing before
 // the loop completes, so you won't have the required data yet!
 // See here for some useful info
