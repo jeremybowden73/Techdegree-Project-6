@@ -7,6 +7,15 @@
 		email: jeremy@jeremybowden.net
 */
 
+//
+// Issue with code is that a CSV file is generated with csvFileCreator 
+// on each iteratiom of the shirtPageLinks.each loop.
+// It would be better if the CSV file was created only once, after the loop
+// has complated, but because the loop contains an asynchronous method (req)
+// moving the csvFileCreator to after the loop would result in it firing before
+// the loop completes, so you won't have the required data yet!
+// See here for some useful info
+// https://blog.lavrton.com/javascript-loops-how-to-handle-async-await-6252dd3c795
 
 // import required npm modules
 const csvFileCreator = require('csv-file-creator'); // For creating a CSV file
