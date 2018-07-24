@@ -58,8 +58,8 @@ function populateCSVDataArray() {
 // without the "await" the code would run asynchronously, so those two lines of code would be
 // executed BEFORE the function "resolveforXSeconds" returns its Promise
 async function f1() {
-  var x = await resolveAfter2Seconds(shirtPageLinks);
-  console.log(x);
+  var promiseResolve = await resolveAfter2Seconds(shirtPageLinks);
+  console.log(promiseResolve);
   console.log("This should be the last thing to log!");
   // create the csv file
   // csvFileCreator(csvFileName, dataForCSV);
@@ -67,7 +67,7 @@ async function f1() {
 
 
 // function to simulate an async method that takes 3 seconds to complete.
-// after it completes it returns 'resolve' i.e. "3 seconds up"
+// after it completes the Promise returns 'resolve' i.e. "3 seconds up"
 function resolveAfter3Seconds(x) {
   return new Promise(function (resolve, reject) {
     setTimeout(() => {
@@ -77,8 +77,14 @@ function resolveAfter3Seconds(x) {
   });
 }
 
-// function to 
-function resolveAfter2Seconds(shirtPageLinks) {
+// function to perform a http request using the async method "req" (i.e. module "request")
+// the Promise returns the string in "resolve" after it completes the request
+// which is fine when there is only one request being made, but I wanted to loop over 8 pages using a .each loop.
+// This brings the problem:
+// If the resolve is inside the .each loop it will resolve after the first iteration of the loop, not the last as I want.
+// But if the resolve is AFTER the loop, the Promise will return the resolve immediately, i.e. BEFORE the async requests
+// in the .each loop are completed.
+function resolveAfter2Seconds() {
   return new Promise(function (resolve, reject) {
 
     req('http://shirts4mike.com/shirt.php?id=101', function (error, response, body) {
@@ -93,7 +99,7 @@ function resolveAfter2Seconds(shirtPageLinks) {
     });
 
 
-    // NOTE: you can't put the resolve here, after the asynchronous "req" function because it will return before the "req" function is done
+    // CANNOT put the resolve here, after the asynchronous "req" function because it will return before the "req" function is done
     // resolve("This is in the 2SECONDS function");
 
 
